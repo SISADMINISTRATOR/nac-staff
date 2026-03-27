@@ -296,6 +296,371 @@
 </div>
 
 <script>
+    let currentUser = null;
+    let users = [];
+    let trainings = [];
+    let reports = [];
+    let penalties = [];
+    let promotions = [];
+    let messages = [];
+    
+    const ranks = [
+        { name: "Кадет", expRequired: 0, canCreateTraining: false, canIssuePenalty: false, canReview: false },
+        { name: "Рядовой", expRequired: 50, canCreateTraining: false, canIssuePenalty: false, canReview: false },
+        { name: "Ефрейтор", expRequired: 150, canCreateTraining: false, canIssuePenalty: false, canReview: false },
+        { name: "Младший сержант", expRequired: 300, canCreateTraining: true, canIssuePenalty: false, canReview: false },
+        { name: "Сержант", expRequired: 500, canCreateTraining: true, canIssuePenalty: false, canReview: false },
+        { name: "Старший сержант", expRequired: 750, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Старшина", expRequired: 1050, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Прапорщик", expRequired: 1400, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Старший прапорщик", expRequired: 1800, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Младший лейтенант", expRequired: 2250, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Лейтенант", expRequired: 2750, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Старший лейтенант", expRequired: 3300, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Капитан", expRequired: 3900, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Майор", expRequired: 4550, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Подполковник", expRequired: 5250, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Полковник", expRequired: 6000, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Генерал-майор", expRequired: 6800, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Генерал-лейтенант", expRequired: 7650, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Генерал-полковник", expRequired: 8550, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Зам. начальника", expRequired: 0, isSpecial: true, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Начальник", expRequired: 0, isSpecial: true, canCreateTraining: true, canIssuePenalty: true, canReview: true }
+    ];
+    
+    function getRank(exp, username) {
+        if (username === 'admin') {
+            return { name: "Начальник", expRequired: 0, isSpecial: true, canCreateTraining: true, canIssuePenalty: true, canReview: true };
+        }
+        
+        let userRank = ranks[0];
+        for (let i = 0; i < ranks.length; i++) {
+            if (!ranks[i].isSpecial && exp >= ranks[i].expRequired) {
+                userRank = ranks[i];
+            }
+        }
+        return userRank;
+    }
+    
+    function loadData() {
+        let savedUsers = localStorage.getItem('nac_users');
+        if (savedUsers) users = JSON.parse(savedUsers);
+        else {
+            users = [{ id: 1, username: "admin", password: "admin", exp: 0, frozenUntil: null, ordinaryPenalties: 0, strictPenalties: 0 }];
+            saveData();
+        }
+        
+        let savedTrainings = localStorage.getItem('nac_trainings');
+        if (savedTrainings) trainings = JSON.parse(savedTrainings);
+        else trainings = [];
+        
+        let savedReports = localStorage.getItem('nac_reports');
+        if (savedReports) reports = JSON.parse(savedReports);
+        else reports = [];
+        
+        let savedPenalties = localStorage.getItem('nac_penalties');
+        if (savedPenalties) penalties = JSON.parse(savedPenalties);
+        else penalties = [];
+        
+        let savedPromotions = localStorage.getItem('nac_promotions');
+        if (savedPromotions) promotions = JSON.parse(savedPromotions);
+        else promotions = [];
+        
+        let savedMessages = localStorage.getItem('nac_messages');
+        if (savedMessages) messages = JSON.parse(savedMessages);
+        else messages = [];
+        
+        let adminUser = users.find(u => u.username === 'admin');
+        if (adminUser) currentUser = adminUser;
+    }
+    
+    function saveData() {
+        localStorage.setItem('nac_users', JSON.stringify(users));
+        localStorage.setItem('nac_trainings', JSON.stringify(trainings));
+        localStorage.setItem('nac_reports', JSON.stringify(reports));
+        localStorage.setItem('nac_penalties', JSON.stringify(penalties));
+        localStorage.setItem('nac_promotions', JSON.stringify(promotions));
+        localStorage.setItem('nac_messages', JSON.stringify(messages));
+    }
+    
+    function logout() {
+        window.location.href = 'https://sisadministrator.github.io/test4/';
+    }
+    
+    function updateUI() {
+        let user = users.find(u => u.id === currentUser.id);
+        if (!user) return;
+        currentUser = user;
+        
+        let rankObj = getRank(user.exp, user.username);
+        document.getElementById('userName').innerText = user.username;
+        document.getElementById('userRank').innerText = rankObj.name;
+        document.getElementById('userExp').innerText = `EXP: ${user.exp}`;
+        
+        let nextRank = null;
+        if (user.username !== 'admin') {
+            for (let i = 0; i < ranks.length; i++) {
+                if (!ranks[i].isSpecial && ranks[i].expRequired > user.exp) {
+                    nextRank = ranks[i];
+                    break;
+                }
+            }
+        }
+        
+        let percent = 0;
+        let prevExp = 0;
+        if (nextRank && user.username !== 'admin') {
+            let prev = ranks.find(r => !r.isSpecial && r.expRequired < nextRank.expRequired);
+            prevExp = prev ? prev.expRequired : 0;
+            percent = ((user.exp - prevExp) / (nextRank.expRequired - prevExp)) * 100;
+            document.getElementById('nextRankInfo').innerHTML = `До звания ${nextRank.name}: ${nextRank.expRequired - user.exp} EXP`;
+        } else if (user.username === 'admin') {
+            percent = 100;
+            document.getElementById('nextRankInfo').innerHTML = `Вы начальник отдела`;
+        } else {
+            percent = 100;
+            document.getElementById('nextRankInfo').innerHTML = `Максимальное звание достигнуто!`;
+        }
+        document.getElementById('expProgress').innerHTML = `<div class="progress-fill" style="width: ${percent}%"></div>`;
+        
+        let profileHtml = '能' +
+            '(<th>Логин:</th> <td>' + user.username + '\\<  \\<\\' +
+            '(<th>Звание:</th> <td>' + rankObj.name + '\\<  \\<\\' +
+            '(<th>EXP:</th> <td>' + user.exp + '\\<  \\<\\' +
+            '(<th>Обычных выговоров:</th> <td>' + (user.ordinaryPenalties || 0) + '/5\\<  \\<\\' +
+            '(<th>Строгих выговоров:</th> <td>' + (user.strictPenalties || 0) + '/3\\<  \\<\\';
+        if (user.frozenUntil && new Date(user.frozenUntil) > new Date()) {
+            profileHtml += '(<th>Заморожен до:</th> <td>' + new Date(user.frozenUntil).toLocaleString() + '\\<  \\<\\';
+        }
+        profileHtml += '处';
+        document.getElementById('profileInfo').innerHTML = profileHtml;
+        
+        let canCreateTraining = rankObj.canCreateTraining;
+        document.getElementById('createTrainingCard').style.display = canCreateTraining ? 'block' : 'none';
+        
+        let canIssuePenalty = rankObj.canIssuePenalty;
+        document.getElementById('issuePenaltyCard').style.display = canIssuePenalty ? 'block' : 'none';
+        
+        let canReview = rankObj.canReview || user.username === 'admin';
+        document.getElementById('allReportsCard').style.display = canReview ? 'block' : 'none';
+        document.getElementById('pendingPromotionsCard').style.display = (canReview || user.username === 'admin') ? 'block' : 'none';
+        
+        loadStaffList();
+        loadTrainings();
+        loadReports();
+        loadPenalties();
+        loadPromotions();
+        loadChat();
+        loadHistory();
+    }
+    
+    function loadHistory() {
+        let userReports = reports.filter(r => r.userId === currentUser.id);
+        let html = '器|<th>Дата</th><th>Событие</th><th>EXP</th>?</p>';
+        userReports.forEach(r => {
+            html += '|<td>' + r.date + '</td><td>Отчёт</td><td>+5</td>?</p>';
+        });
+        html += '</table>';
+        document.getElementById('historyList').innerHTML = html;
+    }
+    
+    function loadStaffList() {
+        let html = '器|<th>Username</th><th>Звание</th><th>EXP</th><th>Статус</th>?</p>';
+        users.forEach(u => {
+            let rank = getRank(u.exp, u.username);
+            let status = u.frozenUntil && new Date(u.frozenUntil) > new Date() ? '❄️ Заморожен' : '✅ Активен';            background: #3b82f6;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background: #dc2626;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .form-row {
+            margin-bottom: 16px;
+        }
+        .form-row input, .form-row select, .form-row textarea {
+            width: 100%;
+            padding: 12px;
+            background: #2a3246;
+            border: 1px solid #3a435c;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+        }
+        .progress-bar {
+            background: #2d3548;
+            border-radius: 20px;
+            height: 8px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .progress-fill {
+            background: #3b82f6;
+            height: 100%;
+            border-radius: 20px;
+        }
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .top-bar { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="mainContainer">
+    <div class="container">
+        <div class="top-bar">
+            <div class="user-info">
+                <span>👤 <span id="userName">admin</span></span>
+                <span class="user-rank" id="userRank">Начальник</span>
+                <span class="user-exp" id="userExp">EXP: 0</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Выход</button>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('profile')">📊 Мой профиль</button>
+            <button class="nav-tab" onclick="showTab('training')">📚 Обучение</button>
+            <button class="nav-tab" onclick="showTab('reports')">📋 Отчёты</button>
+            <button class="nav-tab" onclick="showTab('penalties')">⚠️ Выговоры</button>
+            <button class="nav-tab" onclick="showTab('promotion')">⭐ Запрос на повышение</button>
+            <button class="nav-tab" onclick="showTab('staff')">👥 Сотрудники</button>
+            <button class="nav-tab" onclick="showTab('chat')">💬 Спецсвязь</button>
+            <button class="nav-tab" id="adminTab" onclick="showTab('admin')">👑 Админ-панель</button>
+        </div>
+        
+        <div id="profileTab" class="tab-content">
+            <div class="card">
+                <h2>📊 Мой профиль</h2>
+                <div id="profileInfo"></div>
+                <div class="progress-bar" id="expProgress"></div>
+                <div id="nextRankInfo" style="font-size: 12px; color: #8b92a8; margin-top: 8px;"></div>
+            </div>
+            <div class="card">
+                <h2>📜 История действий</h2>
+                <div id="historyList">Загрузка...</div>
+            </div>
+        </div>
+        
+        <div id="trainingTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>📚 Доступное обучение</h2>
+                <div id="availableTraining"></div>
+            </div>
+            <div class="card" id="createTrainingCard">
+                <h2>➕ Создать обучение</h2>
+                <div class="form-row">
+                    <select id="trainingType">
+                        <option value="theory">📖 Теория</option>
+                        <option value="practice">⚡ Практика</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="text" id="trainingParticipants" placeholder="Username участников (через запятую)">
+                </div>
+                <div class="form-row">
+                    <textarea id="trainingDescription" rows="2" placeholder="Описание обучения"></textarea>
+                </div>
+                <button class="btn-primary" onclick="createTraining()">Создать запрос на обучение</button>
+            </div>
+        </div>
+        
+        <div id="reportsTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>📋 Мои отчёты</h2>
+                <div id="myReports"></div>
+                <button class="btn-primary" onclick="createReport()" style="margin-top: 16px;">➕ Создать отчёт</button>
+            </div>
+            <div class="card" id="allReportsCard">
+                <h2>📋 Все отчёты (для проверки)</h2>
+                <div id="allReports"></div>
+            </div>
+        </div>
+        
+        <div id="penaltiesTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>⚠️ Мои выговоры</h2>
+                <div id="myPenalties"></div>
+            </div>
+            <div class="card" id="issuePenaltyCard">
+                <h2>⚠️ Выдать выговор</h2>
+                <div class="form-row">
+                    <input type="text" id="penaltyUser" placeholder="Username сотрудника">
+                </div>
+                <div class="form-row">
+                    <select id="penaltyType">
+                        <option value="ordinary">📋 Обычный выговор (5 шт → увольнение на 7 дней)</option>
+                        <option value="strict">⚠️ Строгий выговор (3 шт → увольнение на срок)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="number" id="penaltyDays" placeholder="Срок (дней, 0 = бессрочно)">
+                </div>
+                <div class="form-row">
+                    <textarea id="penaltyReason" rows="2" placeholder="Причина выговора"></textarea>
+                </div>
+                <button class="btn-primary" onclick="issuePenalty()">Выдать выговор</button>
+            </div>
+        </div>
+        
+        <div id="promotionTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>⭐ Запрос на повышение</h2>
+                <div class="form-row">
+                    <textarea id="promotionReason" rows="3" placeholder="Обоснование для повышения (достижения, активность и т.д.)"></textarea>
+                </div>
+                <button class="btn-primary" onclick="requestPromotion()">Отправить запрос</button>
+            </div>
+            <div class="card" id="pendingPromotionsCard">
+                <h2>⏳ Ожидающие запросы</h2>
+                <div id="pendingPromotions"></div>
+            </div>
+        </div>
+        
+        <div id="staffTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>👥 Список сотрудников</h2>
+                <div id="staffList"></div>
+            </div>
+        </div>
+        
+        <div id="chatTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>💬 Спецсвязь (общий чат)</h2>
+                <div id="chatMessages" style="height: 300px; overflow-y: auto; background: #2a3246; border-radius: 12px; padding: 16px; margin-bottom: 16px;"></div>
+                <div class="form-row" style="display: flex; gap: 12px;">
+                    <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex: 1;">
+                    <button class="btn-primary" onclick="sendMessage()">📨 Отправить</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="adminTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>👑 Админ-панель</h2>
+                <div class="form-row">
+                    <input type="text" id="adminUser" placeholder="Username">
+                </div>
+                <div class="form-row">
+                    <input type="number" id="adminExp" placeholder="Начислить EXP">
+                </div>
+                <button class="btn-primary" onclick="addExpAdmin()">➕ Начислить EXP</button>
+                <button class="btn-primary" onclick="removePenaltyAdmin()" style="background: #f59e0b; margin-left: 8px;">❌ Снять выговоры</button>
+                <button class="btn-danger" onclick="freezeUserAdmin()" style="margin-top: 12px;">🔒 Заморозить аккаунт</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
     let currentUser = { id: 1, username: "admin", exp: 0 };
     let users = [];
     let trainings = [];
