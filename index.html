@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НАК - Система сотрудников</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, sans-serif;
+            background: #0a0e1a;
+            padding: 20px;
+            color: #e5e7eb;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Авторизация */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
+        }
+        .auth-card {
+            background: #1e2436;
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid #2d3548;
+        }
+        .auth-card h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .auth-card .sub {
+            font-size: 14px;
+            color: #8b92a8;
+            margin-bottom: 32px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #8b92a8;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #2a3246;
+            border: 1px solid #3a435c;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #fff;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        .login-btn:hover {
+            background: #2563eb;
+        }
+        .error-msg {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        /* Основной интерфейс */
+        .main-container {
+            display: none;
+        }
+        .top-bar {
+            background: #1e2436;
+            border-radius: 16px;
+            padding: 12px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .user-rank {
+            background: #2d3548;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .user-exp {
+            background: #3b82f6;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 13px;
+        }
+        .logout-btn {
+            background: #dc2626;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Навигация */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        .nav-tab {
+            background: #1e2436;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            color: #8b92a8;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .nav-tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        /* Карточки */
+        .card {
+            background: #1e2436;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #2d3548;
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        /* Таблицы */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #2d3548;
+        }
+        th {
+            color: #8b92a8;
+            font-weight: 500;
+            font-size: 13px;
+        }
+        .status-pending { color: #f59e0b; }
+        .status-approved { color: #10b981; }
+        .status-rejected { color: #ef4444; }
+        
+        /* Кнопки */
+        .btn-primary {
+            background: #3b82f6;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background: #dc2626;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Формы */
+        .form-row {
+            margin-bottom: 16px;
+        }
+        .form-row input, .form-row select, .form-row textarea {
+            width: 100%;
+            padding: 12px;
+            background: #2a3246;
+            border: 1px solid #3a435c;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+        }
+        
+        /* Прогресс-бар */
+        .progress-bar {
+            background: #2d3548;
+            border-radius: 20px;
+            height: 8px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        .progress-fill {
+            background: #3b82f6;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .top-bar { flex-direction: column; text-align: center; }
+            .user-info { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="authContainer" class="auth-container">
+    <div class="auth-card">
+        <h1>🔐 НАК</h1>
+        <div class="sub">Система сотрудников</div>
+        <div class="input-group">
+            <label>Логин</label>
+            <input type="text" id="loginUsername" placeholder="Введите логин">
+        </div>
+        <div class="input-group">
+            <label>Пароль</label>
+            <input type="password" id="loginPassword" placeholder="Введите пароль">
+        </div>
+        <button class="login-btn" onclick="doLogin()">Войти</button>
+        <div id="loginError" class="error-msg"></div>
+        <div style="margin-top: 24px; text-align: center; font-size: 12px; color: #6b7280;">
+            Для входа используйте логин: admin / пароль: admin
+        </div>
+    </div>
+</div>
+
+<div id="mainContainer" class="main-container">
+    <div class="container">
+        <div class="top-bar">
+            <div class="user-info">
+                <span>👤 <span id="userName">Загрузка...</span></span>
+                <span class="user-rank" id="userRank">Звание</span>
+                <span class="user-exp" id="userExp">EXP: 0</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Выход</button>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('profile')">📊 Мой профиль</button>
+            <button class="nav-tab" onclick="showTab('training')">📚 Обучение</button>
+            <button class="nav-tab" onclick="showTab('reports')">📋 Отчёты</button>
+            <button class="nav-tab" onclick="showTab('penalties')">⚠️ Выговоры</button>
+            <button class="nav-tab" onclick="showTab('promotion')">⭐ Запрос на повышение</button>
+            <button class="nav-tab" onclick="showTab('staff')">👥 Сотрудники</button>
+            <button class="nav-tab" onclick="showTab('chat')">💬 Спецсвязь</button>
+            <button class="nav-tab" id="adminTab" style="display:none" onclick="showTab('admin')">👑 Админ-панель</button>
+        </div>
+        
+        <div id="profileTab" class="tab-content">
+            <div class="card">
+                <h2>📊 Мой профиль</h2>
+                <div id="profileInfo"></div>
+                <div class="progress-bar" id="expProgress"></div>
+                <div id="nextRankInfo" style="font-size: 12px; color: #8b92a8; margin-top: 8px;"></div>
+            </div>
+            <div class="card">
+                <h2>📜 История действий</h2>
+                <div id="historyList">Загрузка...</div>
+            </div>
+        </div>
+        
+        <div id="trainingTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>📚 Доступное обучение</h2>
+                <div id="availableTraining">Загрузка...</div>
+            </div>
+            <div class="card" id="createTrainingCard" style="display:none">
+                <h2>➕ Создать обучение</h2>
+                <div class="form-row">
+                    <select id="trainingType">
+                        <option value="theory">📖 Теория</option>
+                        <option value="practice">⚡ Практика</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="text" id="trainingParticipants" placeholder="Username участников (через запятую)">
+                </div>
+                <div class="form-row">
+                    <textarea id="trainingDescription" rows="2" placeholder="Описание обучения"></textarea>
+                </div>
+                <button class="btn-primary" onclick="createTraining()">Создать запрос на обучение</button>
+            </div>
+        </div>
+        
+        <div id="reportsTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>📋 Мои отчёты</h2>
+                <div id="myReports"></div>
+                <button class="btn-primary" onclick="createReport()" style="margin-top: 16px;">➕ Создать отчёт</button>
+            </div>
+            <div class="card" id="allReportsCard" style="display:none">
+                <h2>📋 Все отчёты (для проверки)</h2>
+                <div id="allReports"></div>
+            </div>
+        </div>
+        
+        <div id="penaltiesTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>⚠️ Мои выговоры</h2>
+                <div id="myPenalties"></div>
+            </div>
+            <div class="card" id="issuePenaltyCard" style="display:none">
+                <h2>⚠️ Выдать выговор</h2>
+                <div class="form-row">
+                    <input type="text" id="penaltyUser" placeholder="Username сотрудника">
+                </div>
+                <div class="form-row">
+                    <select id="penaltyType">
+                        <option value="ordinary">📋 Обычный выговор (5 шт → увольнение на 7 дней)</option>
+                        <option value="strict">⚠️ Строгий выговор (3 шт → увольнение на срок)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <input type="number" id="penaltyDays" placeholder="Срок (дней, 0 = бессрочно)">
+                </div>
+                <div class="form-row">
+                    <textarea id="penaltyReason" rows="2" placeholder="Причина выговора"></textarea>
+                </div>
+                <button class="btn-primary" onclick="issuePenalty()">Выдать выговор</button>
+            </div>
+        </div>
+        
+        <div id="promotionTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>⭐ Запрос на повышение</h2>
+                <div class="form-row">
+                    <textarea id="promotionReason" rows="3" placeholder="Обоснование для повышения (достижения, активность и т.д.)"></textarea>
+                </div>
+                <button class="btn-primary" onclick="requestPromotion()">Отправить запрос</button>
+            </div>
+            <div class="card" id="pendingPromotionsCard" style="display:none">
+                <h2>⏳ Ожидающие запросы</h2>
+                <div id="pendingPromotions"></div>
+            </div>
+        </div>
+        
+        <div id="staffTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>👥 Список сотрудников</h2>
+                <div id="staffList"></div>
+            </div>
+        </div>
+        
+        <div id="chatTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>💬 Спецсвязь (общий чат)</h2>
+                <div id="chatMessages" style="height: 300px; overflow-y: auto; background: #2a3246; border-radius: 12px; padding: 16px; margin-bottom: 16px;"></div>
+                <div class="form-row" style="display: flex; gap: 12px;">
+                    <input type="text" id="chatInput" placeholder="Введите сообщение..." style="flex: 1;">
+                    <button class="btn-primary" onclick="sendMessage()">📨 Отправить</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="adminTab" class="tab-content" style="display:none">
+            <div class="card">
+                <h2>👑 Админ-панель</h2>
+                <div class="form-row">
+                    <input type="text" id="adminUser" placeholder="Username">
+                </div>
+                <div class="form-row">
+                    <input type="number" id="adminExp" placeholder="Начислить EXP">
+                </div>
+                <button class="btn-primary" onclick="addExpAdmin()">➕ Начислить EXP</button>
+                <button class="btn-primary" onclick="removePenaltyAdmin()" style="background: #f59e0b; margin-left: 8px;">❌ Снять выговоры</button>
+                <button class="btn-danger" onclick="freezeUserAdmin()" style="margin-top: 12px;">🔒 Заморозить аккаунт</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== ДАННЫЕ ==========
+    let currentUser = null;
+    let users = [];
+    let trainings = [];
+    let reports = [];
+    let penalties = [];
+    let promotions = [];
+    let messages = [];
+    
+    // Таблица званий
+    const ranks = [
+        { name: "Кадет", expRequired: 0, canCreateTraining: false, canIssuePenalty: false, canReview: false },
+        { name: "Рядовой", expRequired: 50, canCreateTraining: false, canIssuePenalty: false, canReview: false },
+        { name: "Ефрейтор", expRequired: 150, canCreateTraining: false, canIssuePenalty: false, canReview: false },
+        { name: "Младший сержант", expRequired: 300, canCreateTraining: true, canIssuePenalty: false, canReview: false },
+        { name: "Сержант", expRequired: 500, canCreateTraining: true, canIssuePenalty: false, canReview: false },
+        { name: "Старший сержант", expRequired: 750, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Старшина", expRequired: 1050, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Прапорщик", expRequired: 1400, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Старший прапорщик", expRequired: 1800, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Младший лейтенант", expRequired: 2250, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Лейтенант", expRequired: 2750, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Старший лейтенант", expRequired: 3300, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Капитан", expRequired: 3900, canCreateTraining: true, canIssuePenalty: true, canReview: false },
+        { name: "Майор", expRequired: 4550, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Подполковник", expRequired: 5250, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Полковник", expRequired: 6000, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Генерал-майор", expRequired: 6800, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Генерал-лейтенант", expRequired: 7650, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Генерал-полковник", expRequired: 8550, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Зам. начальника", expRequired: 0, isSpecial: true, canCreateTraining: true, canIssuePenalty: true, canReview: true },
+        { name: "Начальник", expRequired: 0, isSpecial: true, canCreateTraining: true, canIssuePenalty: true, canReview: true }
+    ];
+    
+    function getRank(exp) {
+        let userRank = ranks[0];
+        for (let i = 0; i < ranks.length; i++) {
+            if (!ranks[i].isSpecial && exp >= ranks[i].expRequired) {
+                userRank = ranks[i];
+            }
+        }
+        return userRank;
+    }
+    
+    function loadData() {
+        let savedUsers = localStorage.getItem('nac_users');
+        if (savedUsers) users = JSON.parse(savedUsers);
+        else {
+            users = [
+                { id: 1, username: "admin", password: "admin", exp: 0, rank: "Кадет", frozenUntil: null, ordinaryPenalties: 0, strictPenalties: 0, penaltyHistory: [] }
+            ];
+            saveData();
+        }
+        
+        let savedTrainings = localStorage.getItem('nac_trainings');
+        if (savedTrainings) trainings = JSON.parse(savedTrainings);
+        else trainings = [];
+        
+        let savedReports = localStorage.getItem('nac_reports');
+        if (savedReports) reports = JSON.parse(savedReports);
+        else reports = [];
+        
+        let savedPenalties = localStorage.getItem('nac_penalties');
+        if (savedPenalties) penalties = JSON.parse(savedPenalties);
+        else penalties = [];
+        
+        let savedPromotions = localStorage.getItem('nac_promotions');
+        if (savedPromotions) promotions = JSON.parse(savedPromotions);
+        else promotions = [];
+        
+        let savedMessages = localStorage.getItem('nac_messages');
+        if (savedMessages) messages = JSON.parse(savedMessages);
+        else messages = [];
+    }
+    
+    function saveData() {
+        localStorage.setItem('nac_users', JSON.stringify(users));
+        localStorage.setItem('nac_trainings', JSON.stringify(trainings));
+        localStorage.setItem('nac_reports', JSON.stringify(reports));
+        localStorage.setItem('nac_penalties', JSON.stringify(penalties));
+        localStorage.setItem('nac_promotions', JSON.stringify(promotions));
+        localStorage.setItem('nac_messages', JSON.stringify(messages));
+    }
+    
+    // ========== АВТОРИЗАЦИЯ ==========
+    function doLogin() {
+        let username = document.getElementById('loginUsername').value.trim();
+        let password = document.getElementById('loginPassword').value.trim();
+        
+        let user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            currentUser = user;
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            updateUI();
+        } else {
+            document.getElementById('loginError').innerText = 'Неверный логин или пароль';
+        }
+    }
+    
+    function logout() {
+        currentUser = null;
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('mainContainer').style.display = 'block';
+              updateUI();
+    } else {
+        document.getElementById('loginError').innerText = 'Неверный логин или пароль';
+    }
+}
+
+function logout() {
+    currentUser = null;
+    document.getElementById('authContainer').style.display = 'flex';
+    document.getElementById('mainContainer').style.display = 'none';
+}
+
+function updateUI() {
+    let user = users.find(u => u.id === currentUser.id);
+    if (!user) return;
+    currentUser = user;
+    
+    let rankObj = getRank(user.exp);
+    document.getElementById('userName').innerText = user.username;
+    document.getElementById('userRank').innerText = rankObj.name;
+    document.getElementById('userExp').innerText = `EXP: ${user.exp}`;
+    
+    let nextRank = null;
+    for (let i = 0; i < ranks.length; i++) {
+        if (!ranks[i].isSpecial && ranks[i].expRequired > user.exp) {
+            nextRank = ranks[i];
+            break;
+        }
+    }
+    
+    let percent = 0;
+    let prevExp = 0;
+    if (nextRank) {
+        let prev = ranks.find(r => !r.isSpecial && r.expRequired < nextRank.expRequired);
+        prevExp = prev ? prev.expRequired : 0;
+        percent = ((user.exp - prevExp) / (nextRank.expRequired - prevExp)) * 100;
+        document.getElementById('nextRankInfo').innerHTML = `До звания ${nextRank.name}: ${nextRank.expRequired - user.exp} EXP`;
+    } else {
+        percent = 100;
+        document.getElementById('nextRankInfo').innerHTML = `Максимальное звание достигнуто!`;
+    }
+    document.getElementById('expProgress').innerHTML = `<div class="progress-fill" style="width: ${percent}%"></div>`;
+    
+    let profileHtml = '能' +
+        '<tr><th>Логин:</th><td>' + user.username + '</td></tr>' +
+        '<tr><th>Звание:</th><td>' + rankObj.name + '</td></tr>' +
+        '<tr><th>EXP:</th><td>' + user.exp + '</td></tr>' +
+        '<tr><th>Обычных выговоров:</th><td>' + (user.ordinaryPenalties || 0) + '/5</td></tr>' +
+        '<tr><th>Строгих выговоров:</th><td>' + (user.strictPenalties || 0) + '/3</td></tr>';
+    if (user.frozenUntil && new Date(user.frozenUntil) > new Date()) {
+        profileHtml += '<tr><th>Заморожен до:</th><td>' + new Date(user.frozenUntil).toLocaleString() + '</td></tr>';
+    }
+    profileHtml += '</table>';
+    document.getElementById('profileInfo').innerHTML = profileHtml;
+    
+    let canCreateTraining = rankObj.canCreateTraining;
+    document.getElementById('createTrainingCard').style.display = canCreateTraining ? 'block' : 'none';
+    
+    let canIssuePenalty = rankObj.canIssuePenalty;
+    document.getElementById('issuePenaltyCard').style.display = canIssuePenalty ? 'block' : 'none';
+    
+    let canReview = rankObj.canReview || user.username === 'admin';
+    document.getElementById('allReportsCard').style.display = canReview ? 'block' : 'none';
+    document.getElementById('pendingPromotionsCard').style.display = (canReview || user.username === 'admin') ? 'block' : 'none';
+    
+    let isAdmin = user.username === 'admin';
+    document.getElementById('adminTab').style.display = isAdmin ? 'block' : 'none';
+    
+    loadStaffList();
+    loadTrainings();
+    loadReports();
+    loadPenalties();
+    loadPromotions();
+    loadChat();
+    loadHistory();
+}
+
+function loadHistory() {
+    let userReports = reports.filter(r => r.userId === currentUser.id);
+    let userTrainings = trainings.filter(t => t.participants && (t.participants.includes(currentUser.username) || t.creator === currentUser.username));
+    let html = '能<tr><th>Дата</th><th>Событие</th><th>EXP</th></tr>';
+    userReports.forEach(r => {
+        html += '<tr><td>' + r.date + '</td><td>Отчёт</td><td>+5</td></tr>';
+    });
+    userTrainings.forEach(t => {
+        if (t.completed) {
+            html += '<tr><td>' + t.date + '</td><td>Обучение: ' + (t.type === 'theory' ? 'Теория' : 'Практика') + '</td><td>+' + (t.type === 'theory' ? 10 : 15) + '</td></tr>';
+        }
+    });
+    html += '</table>';
+    document.getElementById('historyList').innerHTML = html;
+}
+
+function loadStaffList() {
+    let html = '能<tr><th>Username</th><th>Звание</th><th>EXP</th><th>Статус</th></tr>';
+    users.forEach(u => {
+        let rank = getRank(u.exp);
+        let status = u.frozenUntil && new Date(u.frozenUntil) > new Date() ? '❄️ Заморожен' : '✅ Активен';
+        html += '<tr><td>' + u.username + '</td><td>' + rank.name + '</td><td>' + u.exp + '</td><td>' + status + '</td></tr>';
+    });
+    html += '</table>';
+    document.getElementById('staffList').innerHTML = html;
+}
+
+function loadTrainings() {
+    let html = '能<tr><th>Дата</th><th>Тип</th><th>Организатор</th><th>Участники</th><th>Статус</th></tr>';
+    trainings.forEach(t => {
+        html += '<tr><td>' + t.date + '</td><td>' + (t.type === 'theory' ? '📖 Теория' : '⚡ Практика') + '</td><td>' + t.creator + '</td><td>' + t.participants + '</td><td>' + (t.completed ? '✅ Завершено' : '⏳ Ожидает') + '</td></tr>';
+    });
+    document.getElementById('availableTraining').innerHTML = html;
+}
+
+function loadReports() {
+    let myReportsHtml = '能<tr><th>Дата</th><th>Текст</th><th>Статус</th></tr>';
+    let my = reports.filter(r => r.userId === currentUser.id);
+    my.forEach(r => {
+        myReportsHtml += '<tr><td>' + r.date + '</td><td>' + r.text + '</td><td>' + (r.status || 'Проверяется') + '</td></tr>';
+    });
+    document.getElementById('myReports').innerHTML = myReportsHtml;
+    
+    let allReportsHtml = '能<tr><th>Дата</th><th>Сотрудник</th><th>Текст</th></tr>';
+    reports.forEach(r => {
+        let user = users.find(u => u.id === r.userId);
+        allReportsHtml += '<tr><td>' + r.date + '</td><td>' + (user ? user.username : r.userId) + '</td><td>' + r.text + '</td></tr>';
+    });
+    document.getElementById('allReports').innerHTML = allReportsHtml;
+}
+
+function loadPenalties() {
+    let myPenaltiesHtml = '能<tr><th>Дата</th><th>Тип</th><th>Причина</th><th>Срок</th><th>Кто выдал</th></tr>';
+    let my = penalties.filter(p => p.userId === currentUser.id);
+    my.forEach(p => {
+        let issuer = users.find(u => u.id === p.issuerId);
+        myPenaltiesHtml += '<tr><td>' + p.date + '</td><td>' + (p.type === 'ordinary' ? '📋 Обычный' : '⚠️ Строгий') + '</td><td>' + p.reason + '</td><td>' + (p.days > 0 ? p.days + ' дн.' : 'Бессрочно') + '</td><td>' + (issuer ? issuer.username : p.issuerId) + '</td></tr>';
+    });
+    document.getElementById('myPenalties').innerHTML = myPenaltiesHtml;
+}
+
+function loadPromotions() {
+    let pendingHtml = '能<tr><th>Дата</th><th>Сотрудник</th><th>Обоснование</th><th>Действие</th></tr>';
+    let pending = promotions.filter(p => p.status === 'pending');
+    pending.forEach(p => {
+        let user = users.find(u => u.id === p.userId);
+        pendingHtml += '<tr><td>' + p.date + '</td><td>' + (user ? user.username : p.userId) + '</td><td>' + p.reason + '</td><td><button class="btn-primary" onclick="approvePromotion(' + p.id + ')">✅ Одобрить</button> <button class="btn-danger" onclick="rejectPromotion(' + p.id + ')">❌ Отклонить</button></td></tr>';
+    });
+    document.getElementById('pendingPromotions').innerHTML = pendingHtml;
+}
+
+function loadChat() {
+    let html = '';
+    messages.forEach(m => {
+        let user = users.find(u => u.id === m.userId);
+        html += '<div style="margin-bottom: 12px;"><strong>' + (user ? user.username : m.userId) + '</strong> <span style="font-size: 11px; color: #6b7280;">' + m.date + '</span><br>' + m.text + '</div>';
+    });
+    document.getElementById('chatMessages').innerHTML = html;
+    let chatDiv = document.getElementById('chatMessages');
+    if (chatDiv) chatDiv.scrollTop = chatDiv.scrollHeight;
+}
+
+function createReport() {
+    let text = prompt('Введите текст отчёта:');
+    if (text) {
+        reports.push({
+            id: Date.now(),
+            userId: currentUser.id,
+            date: new Date().toLocaleString(),
+            text: text,
+            status: 'pending'
+        });
+        currentUser.exp += 5;
+        let userIndex = users.findIndex(u => u.id === currentUser.id);
+        users[userIndex].exp = currentUser.exp;
+        saveData();
+        updateUI();
+        alert('Отчёт создан! +5 EXP');
+    }
+}
+
+function createTraining() {
+    let type = document.getElementById('trainingType').value;
+    let participants = document.getElementById('trainingParticipants').value;
+    let description = document.getElementById('trainingDescription').value;
+    
+    if (!participants) {
+        alert('Укажите участников');
+        return;
+    }
+    
+    trainings.push({
+        id: Date.now(),
+        creator: currentUser.username,
+        creatorId: currentUser.id,
+        type: type,
+        participants: participants,
+        description: description,
+        date: new Date().toLocaleString(),
+        completed: false
+    });
+    
+    saveData();
+    alert('Запрос на обучение создан!');
+    document.getElementById('trainingParticipants').value = '';
+    document.getElementById('trainingDescription').value = '';
+    loadTrainings();
+}
+
+function issuePenalty() {
+    let username = document.getElementById('penaltyUser').value.trim();
+    let type = document.getElementById('penaltyType').value;
+    let days = parseInt(document.getElementById('penaltyDays').value) || 0;
+    let reason = document.getElementById('penaltyReason').value;
+    
+    let targetUser = users.find(u => u.username === username);
+    if (!targetUser) {
+        alert('Пользователь не найден');
+        return;
+    }
+    
+    penalties.push({
+        id: Date.now(),
+        userId: targetUser.id,
+        issuerId: currentUser.id,
+        type: type,
+        days: days,
+        reason: reason,
+        date: new Date().toLocaleString(),
+        active: true
+    });
+    
+    if (type === 'ordinary') {
+        targetUser.ordinaryPenalties = (targetUser.ordinaryPenalties || 0) + 1;
+        if (targetUser.ordinaryPenalties >= 5) {
+            targetUser.frozenUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+            alert('Сотрудник ' + username + ' уволен на 1 неделю (5 обычных выговоров)');
+        }
+    } else {
+        targetUser.strictPenalties = (targetUser.strictPenalties || 0) + 1;
+        if (targetUser.strictPenalties >= 3) {
+            let freezeDays = days > 0 ? days : 30;
+            targetUser.frozenUntil = new Date(Date.now() + freezeDays * 24 * 60 * 60 * 1000).toISOString();
+            alert('Сотрудник ' + username + ' уволен на ' + freezeDays + ' дней (3 строгих выговора)');
+        } else if (days > 0) {
+            targetUser.frozenUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+        }
+    }
+    
+    let userIndex = users.findIndex(u => u.id === targetUser.id);
+    users[userIndex] = targetUser;
+    saveData();
+    alert('Выговор выдан');
+    document.getElementById('penaltyUser').value = '';
+    document.getElementById('penaltyReason').value = '';
+    updateUI();
+}
+
+function requestPromotion() {
+    let reason = document.getElementById('promotionReason').value.trim();
+    if (!reason) {
+        alert('Напишите обоснование');
+        return;
+    }
+    
+    promotions.push({
+        id: Date.now(),
+        userId: currentUser.id,
+        reason: reason,
+        date: new Date().toLocaleString(),
+        status: 'pending'
+    });
+    
+    saveData();
+    alert('Запрос на повышение отправлен');
+    document.getElementById('promotionReason').value = '';
+    loadPromotions();
+}
+
+function approvePromotion(id) {
+    let promo = promotions.find(p => p.id === id);
+    if (promo) {
+        promo.status = 'approved';
+        let user = users.find(u => u.id === promo.userId);
+        if (user) {
+            user.exp += 50;
+            let userIndex = users.findIndex(u => u.id === user.id);
+            users[userIndex] = user;
+            alert('Сотруднику ' + user.username + ' начислено +50 EXP за повышение');
+        }
+        saveData();
+        loadPromotions();
+        if (user && user.id === currentUser.id) updateUI();
+    }
+}
+
+function rejectPromotion(id) {
+    let promo = promotions.find(p => p.id === id);
+    if (promo) {
+        promo.status = 'rejected';
+        saveData();
+        loadPromotions();
+    }
+}
+
+function sendMessage() {
+    let text = document.getElementById('chatInput').value.trim();
+    if (text) {
+        messages.push({
+            id: Date.now(),
+            userId: currentUser.id,
+            text: text,
+            date: new Date().toLocaleString()
+        });
+        saveData();
+        loadChat();
+        document.getElementById('chatInput').value = '';
+    }
+}
+
+function addExpAdmin() {
+    let username = document.getElementById('adminUser').value.trim();
+    let exp = parseInt(document.getElementById('adminExp').value);
+    let user = users.find(u => u.username === username);
+    if (user && exp) {
+        user.exp += exp;
+        let userIndex = users.findIndex(u => u.id === user.id);
+        users[userIndex] = user;
+        saveData();
+        alert('Сотруднику ' + username + ' начислено +' + exp + ' EXP');
+        if (user.id === currentUser.id) updateUI();
+        loadStaffList();
+    } else {
+        alert('Пользователь не найден или EXP не указан');
+    }
+}
+
+function removePenaltyAdmin() {
+    let username = document.getElementById('adminUser').value.trim();
+    let user = users.find(u => u.username === username);
+    if (user) {
+        user.ordinaryPenalties = 0;
+        user.strictPenalties = 0;
+        user.frozenUntil = null;
+        let userIndex = users.findIndex(u => u.id === user.id);
+        users[userIndex] = user;
+        saveData();
+        alert('Выговоры сотрудника ' + username + ' сняты');
+        if (user.id === currentUser.id) updateUI();
+        loadStaffList();
+    } else {
+        alert('Пользователь не найден');
+    }
+}
+
+function freezeUserAdmin() {
+    let username = document.getElementById('adminUser').value.trim();
+    let days = prompt('На сколько дней заморозить?');
+    let user = users.find(u => u.username === username);
+    if (user && days) {
+        user.frozenUntil = new Date(Date.now() + parseInt(days) * 24 * 60 * 60 * 1000).toISOString();
+        let userIndex = users.findIndex(u => u.id === user.id);
+        users[userIndex] = user;
+        saveData();
+        alert('Сотрудник ' + username + ' заморожен на ' + days + ' дней');
+        if (user.id === currentUser.id) updateUI();
+        loadStaffList();
+    }
+}
+
+function showTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+    document.getElementById(tab + 'Tab').style.display = 'block';
+    document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    if (tab === 'staff') loadStaffList();
+    if (tab === 'training') loadTrainings();
+    if (tab === 'reports') loadReports();
+    if (tab === 'penalties') loadPenalties();
+    if (tab === 'promotion') loadPromotions();
+    if (tab === 'chat') loadChat();
+}
+
+loadData();
