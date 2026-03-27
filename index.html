@@ -700,78 +700,7 @@ function sendMessage() {
         });
         saveData();
         loadChat();
-        document.getElementById('chatInput').value = '';
-    }
-}
-
-function addExpAdmin() {
-    let username = document.getElementById('adminUser').value.trim();
-    let exp = parseInt(document.getElementById('adminExp').value);
-    let user = users.find(u => u.username === username);
-    if (user && exp) {
-        user.exp += exp;
-        let userIndex = users.findIndex(u => u.id === user.id);
-        users[userIndex] = user;
-        saveData();
-        alert('Сотруднику ' + username + ' начислено +' + exp + ' EXP');
-        if (user.id === currentUser.id) updateUI();
-        loadStaffList();
-    } else {
-        alert('Пользователь не найден или EXP не указан');
-    }
-}
-
-function removePenaltyAdmin() {
-    let username = document.getElementById('adminUser').value.trim();
-    let user = users.find(u => u.username === username);
-    if (user) {
-        user.ordinaryPenalties = 0;
-        user.strictPenalties = 0;
-        user.frozenUntil = null;
-        let userIndex = users.findIndex(u => u.id === user.id);
-        users[userIndex] = user;
-        saveData();
-        alert('Выговоры сотрудника ' + username + ' сняты');
-        if (user.id === currentUser.id) updateUI();
-        loadStaffList();
-    } else {
-        alert('Пользователь не найден');
-    }
-}
-
-function freezeUserAdmin() {
-    let username = document.getElementById('adminUser').value.trim();
-    let days = prompt('На сколько дней заморозить?');
-    let user = users.find(u => u.username === username);
-    if (user && days) {
-        user.frozenUntil = new Date(Date.now() + parseInt(days) * 24 * 60 * 60 * 1000).toISOString();
-        let userIndex = users.findIndex(u => u.id === user.id);
-        users[userIndex] = user;
-        saveData();
-        alert('Сотрудник ' + username + ' заморожен на ' + days + ' дней');
-        if (user.id === currentUser.id) updateUI();
-        loadStaffList();
-    }
-}
-
-function showTab(tab) {
-    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-    document.getElementById(tab + 'Tab').style.display = 'block';
-    document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    if (tab === 'staff') loadStaffList();
-    if (tab === 'training') loadTrainings();
-    if (tab === 'reports') loadReports();
-    if (tab === 'penalties') loadPenalties();
-    if (tab === 'promotion') loadPromotions();
-    if (tab === 'chat') loadChat();
-}
-
-    
-    loadData();
-    updateUI();
-    // Дополнительные права администратора
+    // Установка прав начальника
 function setupAdminRights() {
     let admin = users.find(u => u.username === 'admin');
     if (admin) {
@@ -782,7 +711,6 @@ function setupAdminRights() {
         let adminIndex = users.findIndex(u => u.id === admin.id);
         users[adminIndex] = admin;
         saveData();
-        
         if (currentUser && currentUser.id === admin.id) {
             currentUser.exp = 999999;
             updateUI();
@@ -790,7 +718,8 @@ function setupAdminRights() {
     }
 }
 
-// Вызываем при загрузке
+loadData();
+updateUI();
 setupAdminRights();
 </script>
 
