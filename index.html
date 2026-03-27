@@ -20,82 +20,6 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-        
-        /* Авторизация */
-        .auth-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f2e 100%);
-        }
-        .auth-card {
-            background: #1e2436;
-            border-radius: 24px;
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            border: 1px solid #2d3548;
-        }
-        .auth-card h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: #fff;
-        }
-        .auth-card .sub {
-            font-size: 14px;
-            color: #8b92a8;
-            margin-bottom: 32px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 6px;
-            color: #8b92a8;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px 16px;
-            background: #2a3246;
-            border: 1px solid #3a435c;
-            border-radius: 12px;
-            font-size: 14px;
-            color: #fff;
-        }
-        .input-group input:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: #3b82f6;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            color: white;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-        .login-btn:hover {
-            background: #2563eb;
-        }
-        .error-msg {
-            color: #ef4444;
-            font-size: 12px;
-            margin-top: 12px;
-            text-align: center;
-        }
-        
-        /* Основной интерфейс */
-        .main-container {
-            display: none;
-        }
         .top-bar {
             background: #1e2436;
             border-radius: 16px;
@@ -118,7 +42,6 @@
             padding: 6px 14px;
             border-radius: 30px;
             font-size: 13px;
-            font-weight: 500;
         }
         .user-exp {
             background: #3b82f6;
@@ -134,8 +57,6 @@
             color: white;
             cursor: pointer;
         }
-        
-        /* Навигация */
         .nav-tabs {
             display: flex;
             gap: 8px;
@@ -155,8 +76,6 @@
             background: #3b82f6;
             color: white;
         }
-        
-        /* Карточки */
         .card {
             background: #1e2436;
             border-radius: 20px;
@@ -169,8 +88,6 @@
             margin-bottom: 20px;
             color: #fff;
         }
-        
-        /* Таблицы */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -185,11 +102,6 @@
             font-weight: 500;
             font-size: 13px;
         }
-        .status-pending { color: #f59e0b; }
-        .status-approved { color: #10b981; }
-        .status-rejected { color: #ef4444; }
-        
-        /* Кнопки */
         .btn-primary {
             background: #3b82f6;
             border: none;
@@ -206,8 +118,6 @@
             color: white;
             cursor: pointer;
         }
-        
-        /* Формы */
         .form-row {
             margin-bottom: 16px;
         }
@@ -220,8 +130,6 @@
             color: #fff;
             font-family: inherit;
         }
-        
-        /* Прогресс-бар */
         .progress-bar {
             background: #2d3548;
             border-radius: 20px;
@@ -233,44 +141,21 @@
             background: #3b82f6;
             height: 100%;
             border-radius: 20px;
-            transition: width 0.3s;
         }
-        
         @media (max-width: 768px) {
             body { padding: 12px; }
             .top-bar { flex-direction: column; text-align: center; }
-            .user-info { justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-<div id="authContainer" class="auth-container">
-    <div class="auth-card">
-        <h1>🔐 НАК</h1>
-        <div class="sub">Система сотрудников</div>
-        <div class="input-group">
-            <label>Логин</label>
-            <input type="text" id="loginUsername" placeholder="Введите логин">
-        </div>
-        <div class="input-group">
-            <label>Пароль</label>
-            <input type="password" id="loginPassword" placeholder="Введите пароль">
-        </div>
-        <button class="login-btn" onclick="doLogin()">Войти</button>
-        <div id="loginError" class="error-msg"></div>
-        <div style="margin-top: 24px; text-align: center; font-size: 12px; color: #6b7280;">
-            Для входа используйте логин: admin / пароль: admin
-        </div>
-    </div>
-</div>
-
-<div id="mainContainer" class="main-container">
+<div id="mainContainer">
     <div class="container">
         <div class="top-bar">
             <div class="user-info">
-                <span>👤 <span id="userName">Загрузка...</span></span>
-                <span class="user-rank" id="userRank">Звание</span>
+                <span>👤 <span id="userName">admin</span></span>
+                <span class="user-rank" id="userRank">Начальник</span>
                 <span class="user-exp" id="userExp">EXP: 0</span>
             </div>
             <button class="logout-btn" onclick="logout()">🚪 Выход</button>
@@ -284,7 +169,7 @@
             <button class="nav-tab" onclick="showTab('promotion')">⭐ Запрос на повышение</button>
             <button class="nav-tab" onclick="showTab('staff')">👥 Сотрудники</button>
             <button class="nav-tab" onclick="showTab('chat')">💬 Спецсвязь</button>
-            <button class="nav-tab" id="adminTab" style="display:none" onclick="showTab('admin')">👑 Админ-панель</button>
+            <button class="nav-tab" id="adminTab" onclick="showTab('admin')">👑 Админ-панель</button>
         </div>
         
         <div id="profileTab" class="tab-content">
@@ -303,9 +188,9 @@
         <div id="trainingTab" class="tab-content" style="display:none">
             <div class="card">
                 <h2>📚 Доступное обучение</h2>
-                <div id="availableTraining">Загрузка...</div>
+                <div id="availableTraining"></div>
             </div>
-            <div class="card" id="createTrainingCard" style="display:none">
+            <div class="card" id="createTrainingCard">
                 <h2>➕ Создать обучение</h2>
                 <div class="form-row">
                     <select id="trainingType">
@@ -329,7 +214,7 @@
                 <div id="myReports"></div>
                 <button class="btn-primary" onclick="createReport()" style="margin-top: 16px;">➕ Создать отчёт</button>
             </div>
-            <div class="card" id="allReportsCard" style="display:none">
+            <div class="card" id="allReportsCard">
                 <h2>📋 Все отчёты (для проверки)</h2>
                 <div id="allReports"></div>
             </div>
@@ -340,7 +225,7 @@
                 <h2>⚠️ Мои выговоры</h2>
                 <div id="myPenalties"></div>
             </div>
-            <div class="card" id="issuePenaltyCard" style="display:none">
+            <div class="card" id="issuePenaltyCard">
                 <h2>⚠️ Выдать выговор</h2>
                 <div class="form-row">
                     <input type="text" id="penaltyUser" placeholder="Username сотрудника">
@@ -369,7 +254,7 @@
                 </div>
                 <button class="btn-primary" onclick="requestPromotion()">Отправить запрос</button>
             </div>
-            <div class="card" id="pendingPromotionsCard" style="display:none">
+            <div class="card" id="pendingPromotionsCard">
                 <h2>⏳ Ожидающие запросы</h2>
                 <div id="pendingPromotions"></div>
             </div>
@@ -411,8 +296,7 @@
 </div>
 
 <script>
-    // ========== ДАННЫЕ ==========
-    let currentUser = null;
+    let currentUser = { id: 1, username: "admin", exp: 0 };
     let users = [];
     let trainings = [];
     let reports = [];
@@ -420,7 +304,6 @@
     let promotions = [];
     let messages = [];
     
-    // Таблица званий
     const ranks = [
         { name: "Кадет", expRequired: 0, canCreateTraining: false, canIssuePenalty: false, canReview: false },
         { name: "Рядовой", expRequired: 50, canCreateTraining: false, canIssuePenalty: false, canReview: false },
@@ -459,9 +342,7 @@
         let savedUsers = localStorage.getItem('nac_users');
         if (savedUsers) users = JSON.parse(savedUsers);
         else {
-            users = [
-                { id: 1, username: "admin", password: "admin", exp: 0, rank: "Кадет", frozenUntil: null, ordinaryPenalties: 0, strictPenalties: 0, penaltyHistory: [] }
-            ];
+            users = [{ id: 1, username: "admin", password: "admin", exp: 0, frozenUntil: null, ordinaryPenalties: 0, strictPenalties: 0 }];
             saveData();
         }
         
@@ -484,6 +365,9 @@
         let savedMessages = localStorage.getItem('nac_messages');
         if (savedMessages) messages = JSON.parse(savedMessages);
         else messages = [];
+        
+        let adminUser = users.find(u => u.username === 'admin');
+        if (adminUser) currentUser = adminUser;
     }
     
     function saveData() {
@@ -495,170 +379,158 @@
         localStorage.setItem('nac_messages', JSON.stringify(messages));
     }
     
-    // ========== АВТОРИЗАЦИЯ ==========
-    function doLogin() {
-        let username = document.getElementById('loginUsername').value.trim();
-        let password = document.getElementById('loginPassword').value.trim();
-        
-        let user = users.find(u => u.username === username && u.password === password);
-        if (user) {
-            currentUser = user;
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('mainContainer').style.display = 'block';
-            updateUI();
-        } else {
-            document.getElementById('loginError').innerText = 'Неверный логин или пароль';
-        }
-    }
-    
     function logout() {
-        currentUser = null;
-        document.getElementById('authContainer').style.display = 'flex';
-        document.getElementById('mainContainer').style.display = 'block';
-              updateUI();
-    } else {
-        document.getElementById('loginError').innerText = 'Неверный логин или пароль';
+        window.location.href = 'https://sisadministrator.github.io/test4/';
     }
-}
-
-function logout() {
-    currentUser = null;
-    document.getElementById('authContainer').style.display = 'flex';
-    document.getElementById('mainContainer').style.display = 'none';
-}
-
-function updateUI() {
-    let user = users.find(u => u.id === currentUser.id);
-    if (!user) return;
-    currentUser = user;
     
-    let rankObj = getRank(user.exp);
-    document.getElementById('userName').innerText = user.username;
-    document.getElementById('userRank').innerText = rankObj.name;
-    document.getElementById('userExp').innerText = `EXP: ${user.exp}`;
-    
-    let nextRank = null;
-    for (let i = 0; i < ranks.length; i++) {
-        if (!ranks[i].isSpecial && ranks[i].expRequired > user.exp) {
-            nextRank = ranks[i];
-            break;
+    function updateUI() {
+        let user = users.find(u => u.id === currentUser.id);
+        if (!user) return;
+        currentUser = user;
+        
+        let rankObj = getRank(user.exp);
+        document.getElementById('userName').innerText = user.username;
+        document.getElementById('userRank').innerText = rankObj.name;
+        document.getElementById('userExp').innerText = `EXP: ${user.exp}`;
+        
+        let nextRank = null;
+        for (let i = 0; i < ranks.length; i++) {
+            if (!ranks[i].isSpecial && ranks[i].expRequired > user.exp) {
+                nextRank = ranks[i];
+                break;
+            }
         }
-    }
-    
-    let percent = 0;
-    let prevExp = 0;
-    if (nextRank) {
-        let prev = ranks.find(r => !r.isSpecial && r.expRequired < nextRank.expRequired);
-        prevExp = prev ? prev.expRequired : 0;
-        percent = ((user.exp - prevExp) / (nextRank.expRequired - prevExp)) * 100;
-        document.getElementById('nextRankInfo').innerHTML = `До звания ${nextRank.name}: ${nextRank.expRequired - user.exp} EXP`;
-    } else {
-        percent = 100;
-        document.getElementById('nextRankInfo').innerHTML = `Максимальное звание достигнуто!`;
-    }
-    document.getElementById('expProgress').innerHTML = `<div class="progress-fill" style="width: ${percent}%"></div>`;
-    
-    let profileHtml = '能' +
-        '<tr><th>Логин:</th><td>' + user.username + '</td></tr>' +
-        '<tr><th>Звание:</th><td>' + rankObj.name + '</td></tr>' +
-        '<tr><th>EXP:</th><td>' + user.exp + '</td></tr>' +
-        '<tr><th>Обычных выговоров:</th><td>' + (user.ordinaryPenalties || 0) + '/5</td></tr>' +
-        '<tr><th>Строгих выговоров:</th><td>' + (user.strictPenalties || 0) + '/3</td></tr>';
-    if (user.frozenUntil && new Date(user.frozenUntil) > new Date()) {
-        profileHtml += '<tr><th>Заморожен до:</th><td>' + new Date(user.frozenUntil).toLocaleString() + '</td></tr>';
-    }
-    profileHtml += '</table>';
-    document.getElementById('profileInfo').innerHTML = profileHtml;
-    
-    let canCreateTraining = rankObj.canCreateTraining;
-    document.getElementById('createTrainingCard').style.display = canCreateTraining ? 'block' : 'none';
-    
-    let canIssuePenalty = rankObj.canIssuePenalty;
-    document.getElementById('issuePenaltyCard').style.display = canIssuePenalty ? 'block' : 'none';
-    
-    let canReview = rankObj.canReview || user.username === 'admin';
-    document.getElementById('allReportsCard').style.display = canReview ? 'block' : 'none';
-    document.getElementById('pendingPromotionsCard').style.display = (canReview || user.username === 'admin') ? 'block' : 'none';
-    
-    let isAdmin = user.username === 'admin';
-    document.getElementById('adminTab').style.display = isAdmin ? 'block' : 'none';
-    
-    loadStaffList();
-    loadTrainings();
-    loadReports();
-    loadPenalties();
-    loadPromotions();
-    loadChat();
-    loadHistory();
-}
-
-function loadHistory() {
-    let userReports = reports.filter(r => r.userId === currentUser.id);
-    let userTrainings = trainings.filter(t => t.participants && (t.participants.includes(currentUser.username) || t.creator === currentUser.username));
-    let html = '能<tr><th>Дата</th><th>Событие</th><th>EXP</th></tr>';
-    userReports.forEach(r => {
-        html += '<tr><td>' + r.date + '</td><td>Отчёт</td><td>+5</td></tr>';
-    });
-    userTrainings.forEach(t => {
-        if (t.completed) {
-            html += '<tr><td>' + t.date + '</td><td>Обучение: ' + (t.type === 'theory' ? 'Теория' : 'Практика') + '</td><td>+' + (t.type === 'theory' ? 10 : 15) + '</td></tr>';
+        
+        let percent = 0;
+        let prevExp = 0;
+        if (nextRank) {
+            let prev = ranks.find(r => !r.isSpecial && r.expRequired < nextRank.expRequired);
+            prevExp = prev ? prev.expRequired : 0;
+            percent = ((user.exp - prevExp) / (nextRank.expRequired - prevExp)) * 100;
+            document.getElementById('nextRankInfo').innerHTML = `До звания ${nextRank.name}: ${nextRank.expRequired - user.exp} EXP`;
+        } else {
+            percent = 100;
+            document.getElementById('nextRankInfo').innerHTML = `Максимальное звание достигнуто!`;
         }
-    });
-    html += '</table>';
-    document.getElementById('historyList').innerHTML = html;
-}
-
-function loadStaffList() {
-    let html = '能<tr><th>Username</th><th>Звание</th><th>EXP</th><th>Статус</th></tr>';
-    users.forEach(u => {
-        let rank = getRank(u.exp);
-        let status = u.frozenUntil && new Date(u.frozenUntil) > new Date() ? '❄️ Заморожен' : '✅ Активен';
-        html += '<tr><td>' + u.username + '</td><td>' + rank.name + '</td><td>' + u.exp + '</td><td>' + status + '</td></tr>';
-    });
-    html += '</table>';
-    document.getElementById('staffList').innerHTML = html;
-}
-
-function loadTrainings() {
-    let html = '能<tr><th>Дата</th><th>Тип</th><th>Организатор</th><th>Участники</th><th>Статус</th></tr>';
-    trainings.forEach(t => {
-        html += '<tr><td>' + t.date + '</td><td>' + (t.type === 'theory' ? '📖 Теория' : '⚡ Практика') + '</td><td>' + t.creator + '</td><td>' + t.participants + '</td><td>' + (t.completed ? '✅ Завершено' : '⏳ Ожидает') + '</td></tr>';
+        document.getElementById('expProgress').innerHTML = `<div class="progress-fill" style="width: ${percent}%"></div>`;
+        
+        let profileHtml = '能' +
+            '(<th>Логин:</th> <td>' + user.username + '</td> </tr>' +
+            '(<th>Звание:</th> <td>' + rankObj.name + '</td> </tr>' +
+            '(<th>EXP:</th> <td>' + user.exp + '</td> </tr>' +
+            '(<th>Обычных выговоров:</th> <td>' + (user.ordinaryPenalties || 0) + '/5</td> </tr>' +
+            '(<th>Строгих выговоров:</th> <td>' + (user.strictPenalties || 0) + '/3</td> </tr>';
+        if (user.frozenUntil && new Date(user.frozenUntil) > new Date()) {
+            profileHtml += '(<th>Заморожен до:</th> <td>' + new Date(user.frozenUntil).toLocaleString() + '</td> </tr>';
+        }
+        profileHtml += '</table>';
+        document.getElementById('profileInfo').innerHTML = profileHtml;
+        
+        let canCreateTraining = rankObj.canCreateTraining;
+        document.getElementById('createTrainingCard').style.display = canCreateTraining ? 'block' : 'none';
+        
+        let canIssuePenalty = rankObj.canIssuePenalty;
+        document.getElementById('issuePenaltyCard').style.display = canIssuePenalty ? 'block' : 'none';
+        
+        let canReview = rankObj.canReview || user.username === 'admin';
+        document.getElementById('allReportsCard').style.display = canReview ? 'block' : 'none';
+        document.getElementById('pendingPromotionsCard').style.display = (canReview || user.username === 'admin') ? 'block' : 'none';
+        
+        loadStaffList();
+        loadTrainings();
+        loadReports();
+        loadPenalties();
+        loadPromotions();
+        loadChat();
+        loadHistory();
+    }
+    
+    function loadHistory() {
+        let userReports = reports.filter(r => r.userId === currentUser.id);
+        let html = '<table><tr><th>Дата</th><th>Событие</th><th>EXP</th></tr>';
+        userReports.forEach(r => {
+            html += '<tr><td>' + r.date + '</td><td>Отчёт</td><td>+5</td></tr>';
+        });
+        html += '</table>';
+        document.getElementById('historyList').innerHTML = html;
+    }
+    
+    function loadStaffList() {
+        let html = '<table><tr><th>Username</th><th>Звание</th><th>EXP</th><th>Статус</th></tr>';
+        users.forEach(u => {
+            let rank = getRank(u.exp);
+            let status = u.frozenUntil && new Date(u.frozenUntil) > new Date() ? '❄️ Заморожен' : '✅ Активен';
+            html += '<tr><td>' + u.username + '</td><td>' + rank.name + '</td><td>' + u.exp + '</td><td>' + status + '</td></tr>';
+        });
+        html += '</table>';
+        document.getElementById('staffList').innerHTML = html;
+    }
+    
+    function loadTrainings() {
+        let html = '<table><tr><th>Дата</th><th>Тип</th><th>Организатор</th><th>Участники</th><th>Статус</th></tr>';
+        trainings.forEach(t => {
+             html += '<tr>';
+        html += '<td>' + t.date + '</td>';
+        html += '<td>' + (t.type === 'theory' ? '📖 Теория' : '⚡ Практика') + '</td>';
+        html += '<td>' + t.creator + '</td>';
+        html += '<td>' + t.participants + '</td>';
+        html += '<td>' + (t.completed ? '✅ Завершено' : '⏳ Ожидает') + '</td>';
+        html += '</tr>';
     });
     document.getElementById('availableTraining').innerHTML = html;
 }
 
 function loadReports() {
-    let myReportsHtml = '能<tr><th>Дата</th><th>Текст</th><th>Статус</th></tr>';
+    let myReportsHtml = '<table><tr><th>Дата</th><th>Текст</th><th>Статус</th></tr>';
     let my = reports.filter(r => r.userId === currentUser.id);
     my.forEach(r => {
-        myReportsHtml += '<tr><td>' + r.date + '</td><td>' + r.text + '</td><td>' + (r.status || 'Проверяется') + '</td></tr>';
+        myReportsHtml += '<tr>';
+        myReportsHtml += '<td>' + r.date + '</td>';
+        myReportsHtml += '<td>' + r.text + '</td>';
+        myReportsHtml += '<td>' + (r.status || 'Проверяется') + '</td>';
+        myReportsHtml += '</tr>';
     });
     document.getElementById('myReports').innerHTML = myReportsHtml;
     
-    let allReportsHtml = '能<tr><th>Дата</th><th>Сотрудник</th><th>Текст</th></tr>';
+    let allReportsHtml = '<table><tr><th>Дата</th><th>Сотрудник</th><th>Текст</th></tr>';
     reports.forEach(r => {
         let user = users.find(u => u.id === r.userId);
-        allReportsHtml += '<tr><td>' + r.date + '</td><td>' + (user ? user.username : r.userId) + '</td><td>' + r.text + '</td></tr>';
+        allReportsHtml += '<tr>';
+        allReportsHtml += '<td>' + r.date + '</td>';
+        allReportsHtml += '<td>' + (user ? user.username : r.userId) + '</td>';
+        allReportsHtml += '<td>' + r.text + '</td>';
+        allReportsHtml += '</tr>';
     });
     document.getElementById('allReports').innerHTML = allReportsHtml;
 }
 
 function loadPenalties() {
-    let myPenaltiesHtml = '能<tr><th>Дата</th><th>Тип</th><th>Причина</th><th>Срок</th><th>Кто выдал</th></tr>';
+    let myPenaltiesHtml = '<table><tr><th>Дата</th><th>Тип</th><th>Причина</th><th>Срок</th><th>Кто выдал</th></tr>';
     let my = penalties.filter(p => p.userId === currentUser.id);
     my.forEach(p => {
         let issuer = users.find(u => u.id === p.issuerId);
-        myPenaltiesHtml += '<tr><td>' + p.date + '</td><td>' + (p.type === 'ordinary' ? '📋 Обычный' : '⚠️ Строгий') + '</td><td>' + p.reason + '</td><td>' + (p.days > 0 ? p.days + ' дн.' : 'Бессрочно') + '</td><td>' + (issuer ? issuer.username : p.issuerId) + '</td></tr>';
+        myPenaltiesHtml += '<tr>';
+        myPenaltiesHtml += '<td>' + p.date + '</td>';
+        myPenaltiesHtml += '<td>' + (p.type === 'ordinary' ? '📋 Обычный' : '⚠️ Строгий') + '</td>';
+        myPenaltiesHtml += '<td>' + p.reason + '</td>';
+        myPenaltiesHtml += '<td>' + (p.days > 0 ? p.days + ' дн.' : 'Бессрочно') + '</td>';
+        myPenaltiesHtml += '<td>' + (issuer ? issuer.username : p.issuerId) + '</td>';
+        myPenaltiesHtml += '</tr>';
     });
     document.getElementById('myPenalties').innerHTML = myPenaltiesHtml;
 }
 
 function loadPromotions() {
-    let pendingHtml = '能<tr><th>Дата</th><th>Сотрудник</th><th>Обоснование</th><th>Действие</th></tr>';
+    let pendingHtml = '<table><tr><th>Дата</th><th>Сотрудник</th><th>Обоснование</th><th>Действие</th></tr>';
     let pending = promotions.filter(p => p.status === 'pending');
     pending.forEach(p => {
         let user = users.find(u => u.id === p.userId);
-        pendingHtml += '<tr><td>' + p.date + '</td><td>' + (user ? user.username : p.userId) + '</td><td>' + p.reason + '</td><td><button class="btn-primary" onclick="approvePromotion(' + p.id + ')">✅ Одобрить</button> <button class="btn-danger" onclick="rejectPromotion(' + p.id + ')">❌ Отклонить</button></td></tr>';
+        pendingHtml += '<tr>';
+        pendingHtml += '<td>' + p.date + '</td>';
+        pendingHtml += '<td>' + (user ? user.username : p.userId) + '</td>';
+        pendingHtml += '<td>' + p.reason + '</td>';
+        pendingHtml += '<td><button class="btn-primary" onclick="approvePromotion(' + p.id + ')">✅ Одобрить</button> <button class="btn-danger" onclick="rejectPromotion(' + p.id + ')">❌ Отклонить</button></td>';
+        pendingHtml += '</tr>';
     });
     document.getElementById('pendingPromotions').innerHTML = pendingHtml;
 }
@@ -896,16 +768,10 @@ function showTab(tab) {
     if (tab === 'chat') loadChat();
 }
 
-loadData();
-<button class="login-btn" onclick="adminLogin()" style="background:#10b981; margin-top:8px;">👑 Войти как admin</button>
-    function adminLogin() {
-    let user = users.find(u => u.username === 'admin');
-    if (user) {
-        currentUser = user;
-        document.getElementById('authContainer').style.display = 'none';
-        document.getElementById('mainContainer').style.display = 'block';
-        updateUI();
-    } else {
-        alert('Admin не найден');
-    }
-}
+    
+    loadData();
+    updateUI();
+</script>
+
+</body>
+</html>
