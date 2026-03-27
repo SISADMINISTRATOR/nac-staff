@@ -771,6 +771,27 @@ function showTab(tab) {
     
     loadData();
     updateUI();
+    // Дополнительные права администратора
+function setupAdminRights() {
+    let admin = users.find(u => u.username === 'admin');
+    if (admin) {
+        admin.exp = 999999;
+        admin.ordinaryPenalties = 0;
+        admin.strictPenalties = 0;
+        admin.frozenUntil = null;
+        let adminIndex = users.findIndex(u => u.id === admin.id);
+        users[adminIndex] = admin;
+        saveData();
+        
+        if (currentUser && currentUser.id === admin.id) {
+            currentUser.exp = 999999;
+            updateUI();
+        }
+    }
+}
+
+// Вызываем при загрузке
+setupAdminRights();
 </script>
 
 </body>
