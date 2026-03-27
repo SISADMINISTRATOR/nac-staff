@@ -897,3 +897,15 @@ function showTab(tab) {
 }
 
 loadData();
+<button class="login-btn" onclick="adminLogin()" style="background:#10b981; margin-top:8px;">👑 Войти как admin</button>
+    function adminLogin() {
+    let user = users.find(u => u.username === 'admin');
+    if (user) {
+        currentUser = user;
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        updateUI();
+    } else {
+        alert('Admin не найден');
+    }
+}
